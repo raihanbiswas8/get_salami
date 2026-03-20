@@ -1,21 +1,137 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Salami from Raihan</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Salami from Raihan🌙</title>
     <style>
-        body { text-align: center; font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; margin-top: 50px; }
-        .spinner-container { position: relative; display: inline-block; }
-        .arrow { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #e74c3c; z-index: 10; }
-        canvas { border: 10px solid #ecf0f1; border-radius: 50%; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
-        #spin-btn { margin-top: 30px; padding: 15px 50px; font-size: 22px; font-weight: bold; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 50px; box-shadow: 0 4px #1e8449; }
-        #spin-btn:disabled { background: #7f8c8d; cursor: not-allowed; }
-        #result { margin-top: 25px; font-size: 28px; color: #f1c40f; min-height: 40px; }
+        /* General Styles */
+        body { 
+            text-align: center; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            background: #2c3e50; 
+            color: white; 
+            margin: 0; 
+            padding-top: 50px; 
+            overflow-x: hidden;
+        }
 
-        /* Pop-up Overlay */
-        #form-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; }
-        #claim-form { background: #34495e; padding: 30px; border-radius: 15px; width: 320px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; font-size: 16px; }
-        #submit-btn { background: #f1c40f; color: #2c3e50; font-weight: bold; padding: 12px 20px; border: none; cursor: pointer; width: 100%; border-radius: 5px; font-size: 18px; margin-top: 15px;}
+        h1 { margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+
+        /* Spinner Container */
+        .spinner-container { 
+            position: relative; 
+            display: inline-block; 
+            margin-bottom: 20px;
+        }
+        
+        /* The Red Arrow Indicator */
+        .arrow { 
+            position: absolute; 
+            top: -25px; 
+            left: 50%; 
+            transform: translateX(-50%); 
+            width: 0; 
+            height: 0; 
+            border-left: 20px solid transparent; 
+            border-right: 20px solid transparent; 
+            border-top: 45px solid #e74c3c; 
+            z-index: 10; 
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+
+        /* The Canvas Wheel */
+        canvas { 
+            border: 12px solid #ecf0f1; 
+            border-radius: 50%; 
+            background: white; 
+            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
+            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1); 
+            max-width: 90vw;
+            max-height: 90vw;
+        }
+
+        /* Buttons */
+        #spin-btn { 
+            margin-top: 30px; 
+            padding: 18px 60px; 
+            font-size: 24px; 
+            font-weight: bold; 
+            cursor: pointer; 
+            background: #27ae60; 
+            color: white; 
+            border: none; 
+            border-radius: 50px; 
+            box-shadow: 0 5px #1e8449;
+            transition: 0.2s;
+        }
+        #spin-btn:active { transform: translateY(3px); box-shadow: 0 2px #1e8449; }
+        #spin-btn:disabled { background: #7f8c8d; cursor: not-allowed; box-shadow: none; opacity: 0.7; }
+
+        #result { margin-top: 25px; font-size: 28px; color: #f1c40f; font-weight: bold; min-height: 40px; }
+
+        /* Pop-up Overlay (Modal) */
+        #form-overlay { 
+            display: none; 
+            position: fixed; 
+            top: 0; left: 0; 
+            width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.9); 
+            z-index: 100; 
+            justify-content: center; 
+            align-items: center; 
+        }
+
+        #claim-form { 
+            background: #34495e; 
+            padding: 35px; 
+            border-radius: 20px; 
+            width: 340px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
+            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        @keyframes popIn {
+            from { transform: scale(0.6); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        input { 
+            width: 90%; 
+            padding: 14px; 
+            margin: 12px 0; 
+            border-radius: 8px; 
+            border: 2px solid #2c3e50; 
+            font-size: 16px; 
+            outline: none;
+        }
+        input:focus { border-color: #f1c40f; }
+
+        #submit-btn { 
+            background: #f1c40f; 
+            color: #2c3e50; 
+            font-weight: bold; 
+            padding: 14px; 
+            border: none; 
+            cursor: pointer; 
+            width: 100%; 
+            border-radius: 8px; 
+            font-size: 20px; 
+            margin-top: 15px;
+            transition: background 0.3s;
+        }
+        #submit-btn:hover { background: #d4ac0d; }
+
+        .share-btn {
+            display: inline-block;
+            margin-top: 20px;
+            padding: 12px 25px;
+            background: #25D366;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -33,15 +149,19 @@
 
     <div id="form-overlay">
         <div id="claim-form">
-            <h3>Claim Your Salami</h3>
-            <p id="won-display" style="color: #f1c40f; font-size: 24px; font-weight: bold;"></p>
-            <input type="text" id="userName" placeholder="Your Name" required>
-            <input type="text" id="userPhone" placeholder="bKash Number (01XXXXXXXXX)" required>
-            <button id="submit-btn">Submit Details</button>
+            <div id="form-content">
+                <h3 style="margin-top:0;">Claim Your Salami</h3>
+                <p style="font-size: 18px;">You won: <span id="won-display" style="color:#f1c40f; font-weight:bold;"></span></p>
+                <input type="text" id="userName" placeholder="Your Name" required>
+                <input type="text" id="userPhone" placeholder="bKash Number (11 digits)" required>
+                <button id="submit-btn">Submit & Save</button>
+            </div>
         </div>
     </div>
 
     <script>
+        // --- 1. CONFIGURATION ---
+        // Replace this with your Google Apps Script Web App URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbw8b5cvCcUwKN-xEPaaW3V2bDY4ilaz-jTG952utvZiBZqa4Ct2BMe_MVBWSE3A7wqeeQ/exec'; 
 
         const canvas = document.getElementById('wheel');
@@ -51,120 +171,138 @@
         const overlay = document.getElementById('form-overlay');
         const wonDisplay = document.getElementById('won-display');
 
-        // New Prize List
-        const prizes = [6.9, 5.9, 7.9, 15.9, 4.9, 9.9, 69.69, 19.9, 12.25, 10.75];
+        const prizes = [6.9, 5.9, 7.9, 8.9, 4.9, 9.9, 69.69, 12.9, 15.25, 10.75];
         const colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71', '#1abc9c', '#34495e', '#7f8c8d', '#d35400'];
         const prizeCount = prizes.length;
         const arc = (2 * Math.PI) / prizeCount;
         let totalRotation = 0;
         let currentWonAmount = 0;
 
+        // --- 2. INITIALIZE ---
+        window.onload = () => {
+            if (localStorage.getItem('salami_claimed')) {
+                btn.disabled = true;
+                btn.innerText = "ALREADY SPUN";
+                resDiv.innerText = "You have already claimed your Salami! 🌙";
+            }
+            drawWheel();
+        };
+
         function drawWheel() {
             prizes.forEach((prize, i) => {
                 const angle = i * arc;
-                ctx.beginPath(); ctx.fillStyle = colors[i % colors.length]; ctx.moveTo(225, 225); ctx.arc(225, 225, 225, angle, angle + arc); ctx.lineTo(225, 225); ctx.fill();
-                ctx.save(); ctx.translate(225, 225); ctx.rotate(angle + arc / 2); ctx.textAlign = "right"; ctx.fillStyle = "white"; ctx.font = "bold 15px Arial";
-                ctx.fillText(prize + " TK", 210, 8); ctx.restore();
+                ctx.beginPath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.moveTo(225, 225);
+                ctx.arc(225, 225, 225, angle, angle + arc);
+                ctx.lineTo(225, 225);
+                ctx.fill();
+
+                // Add Prize Text
+                ctx.save();
+                ctx.translate(225, 225);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 16px Arial";
+                ctx.fillText(prize + " TK", 210, 8);
+                ctx.restore();
             });
         }
 
+        // --- 3. SPIN LOGIC ---
         btn.onclick = () => {
-            btn.disabled = true;
-            resDiv.innerText = "Good luck...";
+            if (localStorage.getItem('salami_claimed')) return;
 
-            // Track spin count in local storage
-            let spinCount = parseInt(localStorage.getItem('total_spins') || '0') + 1;
-            localStorage.setItem('total_spins', spinCount);
+            btn.disabled = true;
+            resDiv.innerText = "Spinning for luck...";
+
+            // Track global device spins for the 20th spin special (69.69 TK at Index 6)
+            let spinCount = parseInt(localStorage.getItem('total_spins_counter') || '0') + 1;
+            localStorage.setItem('total_spins_counter', spinCount);
 
             let targetIndex;
-            // Requirement: 69.69 (Index 6) on the 20th spin
             if (spinCount === 20) {
-                targetIndex = 6; 
+                targetIndex = 6; // Force land on 69.69
             } else {
-                // Otherwise, pick a random index EXCEPT 6 (to keep 69.69 rare/locked)
-                // If you want 69.69 to be possible before 20, just use: Math.floor(Math.random() * prizeCount)
-                do {
-                    targetIndex = Math.floor(Math.random() * prizeCount);
-                } while (targetIndex === 6); 
+                // Otherwise random, but exclude 69.69 to keep it for the 20th spin
+                do { targetIndex = Math.floor(Math.random() * prizeCount); } 
+                while (targetIndex === 6);
             }
 
             currentWonAmount = prizes[targetIndex];
-            const spins = 6 * 360; 
+            const spins = 10 * 360; // Extra spins for drama
             const degreesPerSegment = 360 / prizeCount;
             const targetCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
-            const finalAngle = spins + (270 - targetCenterAngle);
             
+            // Align chosen segment to the 12 o'clock (270deg) position
+            const finalAngle = spins + (270 - targetCenterAngle);
             totalRotation += (finalAngle - (totalRotation % 360)) + 360;
+
             canvas.style.transform = `rotate(${totalRotation}deg)`;
 
             setTimeout(() => {
                 resDiv.innerText = `🎉 You won ${currentWonAmount} TK!`;
                 wonDisplay.innerText = `${currentWonAmount} TK`;
                 overlay.style.display = "flex";
-            }, 4000);
+            }, 5200);
         };
 
+        // --- 4. FORM SUBMISSION ---
         document.getElementById('submit-btn').onclick = function() {
-    const name = document.getElementById('userName').value.trim();
-    const phone = document.getElementById('userPhone').value.trim();
-    const submitBtn = this;
+            const name = document.getElementById('userName').value.trim();
+            const phone = document.getElementById('userPhone').value.trim();
+            const bkashRegex = /^01[3-9]\d{8}$/;
 
-    // 1. Validation
-    const bkashRegex = /^01[3-9]\d{8}$/; 
-    if (name.length < 2) {
-        alert("Please enter your name.");
-        return;
-    }
-    if (!bkashRegex.test(phone)) {
-        alert("Please enter a valid 11-digit bKash number.");
-        return;
-    }
+            if (name.length < 2) {
+                alert("Please enter your name.");
+                return;
+            }
+            if (!bkashRegex.test(phone)) {
+                alert("Please enter a valid 11-digit bKash number (starts with 01).");
+                return;
+            }
 
-    // 2. UI Update during submission
-    submitBtn.innerText = "Processing...";
-    submitBtn.disabled = true;
+            this.innerText = "Sending...";
+            this.disabled = true;
 
-    // 3. Send to Google Sheet
-    fetch(scriptURL, {
-        method: 'POST',
-        mode: 'no-cors', 
-        cache: 'no-cache',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
-            name: name, 
-            phone: phone, 
-            amount: currentWonAmount + " TK" 
-        })
-    })
-    .then(() => {
-        // --- THE UPDATED WELCOME / SUCCESS MESSAGE ---
-        resDiv.innerHTML = "✅ Salami Request Successful!";
-        
-        document.getElementById('claim-form').innerHTML = `
-            <div style="text-align:center; padding: 10px;">
-                <h2 style="color: #27ae60; margin-bottom: 10px;">🎉 Congratulations, ${name}!</h2>
-                <p style="font-size: 18px; line-height: 1.5;">
-                    Your salami of <strong>${currentWonAmount} TK</strong> will be sent to 
-                    <span style="color: #f1c40f;">${phone}</span> soon.
-                </p>
-                <hr style="border: 0; border-top: 1px solid #5d6d7e; margin: 20px 0;">
-                <p style="font-style: italic; color: #bdc3c7;">
-                    "Don't forget to share after receiving your salami!"
-                </p>
-                <button onclick="location.reload()" style="margin-top:15px; background:transparent; border:1px solid #fff; color:#fff; padding:5px 15px; border-radius:5px; cursor:pointer;">Close</button>
-            </div>`;
-        
-        // Mark as claimed so they can't spin again
-        localStorage.setItem('salami_claimed', 'true');
-    })
-    .catch(err => {
-        alert("Submission failed. Check your internet connection.");
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Submit Details";
-    });
-};
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors',
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    name: name, 
+                    phone: phone, 
+                    amount: currentWonAmount + " TK" 
+                })
+            }).then(() => {
+                // Mark as claimed
+                localStorage.setItem('salami_claimed', 'true');
 
-        drawWheel();
+                // Generate WhatsApp Share Link
+                const shareText = `I just won ${currentWonAmount} TK Salami from this spinner! Try your luck here: ${window.location.href}`;
+                const waLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
+
+                document.getElementById('claim-form').innerHTML = `
+                    <div style="text-align:center;">
+                        <h2 style="color: #27ae60; margin-bottom:10px;">🎉 Congratulations, ${name}!</h2>
+                        <p style="font-size:18px; line-height:1.4;">
+                            Your salami of <strong>${currentWonAmount} TK</strong> will be sent to <strong>${phone}</strong> soon.
+                        </p>
+                        <p style="font-style:italic; margin-top:20px; color:#bdc3c7;">
+                            "Don't forget to share after receiving salami!"
+                        </p>
+                        <a href="${waLink}" target="_blank" class="share-btn">Share on WhatsApp</a>
+                        <br><br>
+                        <button onclick="location.reload()" style="background:none; border:none; color:#bdc3c7; cursor:pointer; text-decoration:underline; font-size:14px;">Close</button>
+                    </div>`;
+            }).catch(err => {
+                alert("Error sending request. Please check internet.");
+                this.disabled = false;
+                this.innerText = "Submit & Save";
+            });
+        };
     </script>
 </body>
 </html>
