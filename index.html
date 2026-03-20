@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Salami Spinner</title>
+    <style>
+        body { text-align: center; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; }
+        canvas { margin-top: 20px; border: 5px solid #333; border-radius: 50%; background: white; }
+        #spin-btn { margin-top: 20px; padding: 15px 40px; font-size: 20px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 5px; }
+        #result { margin-top: 20px; font-size: 24px; font-weight: bold; color: #2c3e50; }
+    </style>
+</head>
+<body>
+    <h1>🌙 Eid Salami Spinner</h1>
+    <canvas id="wheel" width="400" height="400"></canvas><br>
+    <button id="spin-btn">SPIN FOR SALAMI!</button>
+    <div id="result"></div>
+
+    <script>
+        const canvas = document.getElementById('wheel');
+        const ctx = canvas.getContext('2d');
+        const btn = document.getElementById('spin-btn');
+        const resDiv = document.getElementById('result');
+
+        const prizes = [2, 5, 6.9, 9, 19, 29, 39, 49, 59, 69, 79, 89, 99];
+        const colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71', '#1abc9c', '#34495e', '#7f8c8d', '#d35400', '#c0392b', '#8e44ad', '#2980b9'];
+        
+        let currentRotation = 0;
+        const prizeCount = prizes.length;
+        const arc = (2 * Math.PI) / prizeCount;
+
+        function drawWheel() {
+            prizes.forEach((prize, i) => {
+                const angle = i * arc;
+                ctx.beginPath();
+                ctx.fillStyle = colors[i % colors.length];
+                ctx.moveTo(200, 200);
+                ctx.arc(200, 200, 200, angle, angle + arc);
+                ctx.lineTo(200, 200);
+                ctx.fill();
+
+                // Add Text
+                ctx.save();
+                ctx.translate(200, 200);
+                ctx.rotate(angle + arc / 2);
+                ctx.textAlign = "right";
+                ctx.fillStyle = "white";
+                ctx.font = "bold 18px Arial";
+                ctx.fillText(prize + " TK", 180, 10);
+                ctx.restore();
+            });
+        }
+
+        btn.onclick = () => {
+            btn.disabled = true;
+            resDiv.innerText = "Spinning...";
+            
+            // LOGIC: Ensure it always lands on index 2 (which is 6.9 TK)
+            const targetIndex = 2; 
+            const extraSpins = 5 * 360; // Spin 5 times for effect
+            
+            // Calculate angle to land on targetIndex
+            // The wheel stops at the 3 o'clock position (0 rad), so we adjust:
+            const stopAngle = 360 - (targetIndex * (360 / prizeCount)) - (180 / prizeCount);
+            const totalRotation = extraSpins + stopAngle;
+
+            canvas.style.transition = "transform 4s cubic-bezier(0.15, 0, 0.15, 1)";
+            canvas.style.transform = `rotate(${totalRotation}deg)`;
+
+            setTimeout(() => {
+                resDiv.innerText = "🎉 Congratulations! You won 6.9 TK!";
+                btn.disabled = false;
+            }, 4000);
+        };
+
+        drawWheel();
+    </script>
+</body>
+</html>
