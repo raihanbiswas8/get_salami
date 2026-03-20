@@ -160,6 +160,30 @@
     </div>
 
     <script>
+        // --- 0. THE KILL SWITCH ---
+const isOutOfSalami = true; // Set to 'false' if you ever want to reopen!
+
+if (isOutOfSalami) {
+    window.onload = () => {
+        // Disable the button
+        btn.disabled = true;
+        btn.style.background = "#7f8c8d";
+        btn.innerText = "CLOSED";
+        
+        // Show your funny message
+        resDiv.innerHTML = `
+            <div style="background: #e74c3c; padding: 20px; border-radius: 10px; margin-top: 20px; border: 2px solid #fff;">
+                <h2 style="margin:0;">গরীব হয়ে গেছি, আজ আর নয়! 💸</h2>
+                <p style="font-size: 16px; margin-top:10px;">সব সালামি শেষ। আবার দেখা হবে ইনশাআল্লাহ্।</p>
+            </div>
+        `;
+        
+        // Hide the arrow so it looks "off duty"
+        document.querySelector('.arrow').style.display = 'none';
+        // Make the wheel look grayscale/faded
+        canvas.style.filter = 'grayscale(100%) opacity(0.5)';
+    };
+}
         // --- 1. CONFIGURATION ---
         // Replace this with your Google Apps Script Web App URL
         const scriptURL = 'https://script.google.com/macros/s/AKfycbw8b5cvCcUwKN-xEPaaW3V2bDY4ilaz-jTG952utvZiBZqa4Ct2BMe_MVBWSE3A7wqeeQ/exec'; 
