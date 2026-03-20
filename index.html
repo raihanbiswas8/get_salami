@@ -3,30 +3,55 @@
 <head>
     <title>Salami Spinner</title>
     <style>
-        body { text-align: center; font-family: 'Segoe UI', sans-serif; background: #f4f4f4; }
-        canvas { margin-top: 20px; border: 5px solid #333; border-radius: 50%; background: white; }
-        #spin-btn { margin-top: 20px; padding: 15px 40px; font-size: 20px; cursor: pointer; background: #e74c3c; color: white; border: none; border-radius: 5px; }
-        #result { margin-top: 20px; font-size: 24px; font-weight: bold; color: #2c3e50; }
+        body { text-align: center; font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; margin-top: 50px; }
+        .spinner-container { position: relative; display: inline-block; }
+        .arrow { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #e74c3c; z-index: 10; }
+        canvas { border: 10px solid #ecf0f1; border-radius: 50%; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
+        
+        #spin-btn { margin-top: 30px; padding: 15px 50px; font-size: 22px; font-weight: bold; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 50px; }
+        #spin-btn:disabled { background: #7f8c8d; cursor: not-allowed; }
+
+        /* Form Styling */
+        #claim-form { display: none; margin-top: 20px; background: #34495e; padding: 20px; border-radius: 10px; width: 300px; margin-left: auto; margin-right: auto; }
+        input { width: 90%; padding: 10px; margin: 10px 0; border-radius: 5px; border: none; }
+        #submit-btn { background: #f1c40f; color: #2c3e50; font-weight: bold; padding: 10px 20px; border: none; cursor: pointer; width: 100%; }
+        #result { margin-top: 25px; font-size: 28px; color: #f1c40f; }
     </style>
 </head>
 <body>
-    <h1>🌙 Eid Salami Spinner</h1>
-    <canvas id="wheel" width="400" height="400"></canvas><br>
-    <button id="spin-btn">SPIN FOR SALAMI!</button>
+
+    <h1>Get Your Salami from Raihan🌙</h1>
+    
+    <div class="spinner-container">
+        <div class="arrow"></div>
+        <canvas id="wheel" width="400" height="400"></canvas>
+    </div>
+
+    <br>
+    <button id="spin-btn">SPIN NOW!</button>
     <div id="result"></div>
 
+    <div id="claim-form">
+        <h3>Claim Your Salami</h3>
+        <input type="text" id="userName" placeholder="Your Name" required>
+        <input type="text" id="userPhone" placeholder="bKash Number" required>
+        <button id="submit-btn">Submit to Sheet</button>
+    </div>
+
     <script>
+        // --- PASTE YOUR GOOGLE SCRIPT URL HERE ---
+        const scriptURL = 'https://script.google.com/macros/s/AKfycbw8b5cvCcUwKN-xEPaaW3V2bDY4ilaz-jTG952utvZiBZqa4Ct2BMe_MVBWSE3A7wqeeQ/exec';
+
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
         const btn = document.getElementById('spin-btn');
         const resDiv = document.getElementById('result');
+        const form = document.getElementById('claim-form');
 
         const prizes = [2, 5, 6.9, 9, 19, 29, 39, 49, 59, 69, 79, 89, 99];
         const colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71', '#1abc9c', '#34495e', '#7f8c8d', '#d35400', '#c0392b', '#8e44ad', '#2980b9'];
-        
-        let currentRotation = 0;
-        const prizeCount = prizes.length;
-        const arc = (2 * Math.PI) / prizeCount;
+        const arc = (2 * Math.PI) / prizes.length;
+        let totalRotation = 0;
 
         function drawWheel() {
             prizes.forEach((prize, i) => {
@@ -37,14 +62,10 @@
                 ctx.arc(200, 200, 200, angle, angle + arc);
                 ctx.lineTo(200, 200);
                 ctx.fill();
-
-                // Add Text
                 ctx.save();
                 ctx.translate(200, 200);
                 ctx.rotate(angle + arc / 2);
-                ctx.textAlign = "right";
-                ctx.fillStyle = "white";
-                ctx.font = "bold 18px Arial";
+                ctx.textAlign = "right"; ctx.fillStyle = "white"; ctx.font = "bold 16px Arial";
                 ctx.fillText(prize + " TK", 180, 10);
                 ctx.restore();
             });
@@ -52,24 +73,43 @@
 
         btn.onclick = () => {
             btn.disabled = true;
+            form.style.display = "none";
             resDiv.innerText = "Spinning...";
             
-            // LOGIC: Ensure it always lands on index 2 (which is 6.9 TK)
-            const targetIndex = 2; 
-            const extraSpins = 5 * 360; // Spin 5 times for effect
-            
-            // Calculate angle to land on targetIndex
-            // The wheel stops at the 3 o'clock position (0 rad), so we adjust:
-            const stopAngle = 360 - (targetIndex * (360 / prizeCount)) - (180 / prizeCount);
-            const totalRotation = extraSpins + stopAngle;
+            const targetIndex = 2; // Fixed at 6.9 TK
+            const spins = 5 * 360;
+            const degreesPerSegment = 360 / prizes.length;
+            const targetCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
+            const finalAngle = spins + (270 - targetCenterAngle);
+            totalRotation += (finalAngle - (totalRotation % 360)) + 360;
 
-            canvas.style.transition = "transform 4s cubic-bezier(0.15, 0, 0.15, 1)";
             canvas.style.transform = `rotate(${totalRotation}deg)`;
 
             setTimeout(() => {
-                resDiv.innerText = "🎉 Congratulations! You won 6.9 TK!";
-                btn.disabled = false;
+                resDiv.innerText = "🎉 You won 6.9 TK!";
+                form.style.display = "block"; // Show the form
             }, 4000);
+        };
+
+        document.getElementById('submit-btn').onclick = function() {
+            const name = document.getElementById('userName').value;
+            const phone = document.getElementById('userPhone').value;
+
+            if(!name || !phone) { alert("Fill both boxes!"); return; }
+
+            this.innerText = "Sending...";
+            this.disabled = true;
+
+            fetch(scriptURL, {
+                method: 'POST',
+                mode: 'no-cors', // Essential for Google Apps Script
+                cache: 'no-cache',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name: name, phone: phone, amount: "6.9 TK" })
+            }).then(() => {
+                resDiv.innerText = "Salami request sent successfully!";
+                form.innerHTML = "<h4>Saved! Check your bKash soon.</h4>";
+            }).catch(err => alert("Error: " + err));
         };
 
         drawWheel();
