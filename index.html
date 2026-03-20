@@ -3,52 +3,19 @@
 <head>
     <title>Salami from Raihan</title>
     <style>
-        /* Main Styling */
         body { text-align: center; font-family: 'Segoe UI', sans-serif; background: #2c3e50; color: white; margin-top: 50px; }
         .spinner-container { position: relative; display: inline-block; }
-        
-        /* The Arrow */
         .arrow { position: absolute; top: -20px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 20px solid transparent; border-right: 20px solid transparent; border-top: 40px solid #e74c3c; z-index: 10; }
-
-        /* The Wheel Canvas */
         canvas { border: 10px solid #ecf0f1; border-radius: 50%; background: white; box-shadow: 0 10px 30px rgba(0,0,0,0.5); transition: transform 4s cubic-bezier(0.15, 0, 0.15, 1); }
-
-        /* The Spin Button */
         #spin-btn { margin-top: 30px; padding: 15px 50px; font-size: 22px; font-weight: bold; cursor: pointer; background: #27ae60; color: white; border: none; border-radius: 50px; box-shadow: 0 4px #1e8449; }
         #spin-btn:disabled { background: #7f8c8d; cursor: not-allowed; }
-
-        /* Result Text */
         #result { margin-top: 25px; font-size: 28px; color: #f1c40f; min-height: 40px; }
 
-        /* --- THE POP-UP (MODAL) STYLING --- */
-        #form-overlay {
-            display: none; /* Hidden by default */
-            position: fixed; /* Stays in place */
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background-color: rgba(0,0,0,0.8); /* Black w/ opacity */
-            z-index: 100; /* Sits on top */
-            justify-content: center; /* Center horizontally */
-            align-items: center; /* Center vertically */
-        }
-
-        #claim-form {
-            background-color: #34495e;
-            padding: 30px;
-            border-radius: 15px;
-            width: 320px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
-            animation: popIn 0.3s ease-out; /* Pop-in effect */
-        }
-
+        /* Pop-up Overlay */
+        #form-overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 100; justify-content: center; align-items: center; }
+        #claim-form { background: #34495e; padding: 30px; border-radius: 15px; width: 320px; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         input { width: 90%; padding: 12px; margin: 10px 0; border-radius: 5px; border: none; font-size: 16px; }
         #submit-btn { background: #f1c40f; color: #2c3e50; font-weight: bold; padding: 12px 20px; border: none; cursor: pointer; width: 100%; border-radius: 5px; font-size: 18px; margin-top: 15px;}
-        #submit-btn:disabled { background: #95a5a6; }
-
-        @keyframes popIn {
-            from { transform: scale(0.5); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
     </style>
 </head>
 <body>
@@ -57,25 +24,24 @@
     
     <div class="spinner-container">
         <div class="arrow"></div>
-        <canvas id="wheel" width="400" height="400"></canvas>
+        <canvas id="wheel" width="450" height="450"></canvas>
     </div>
 
     <br>
-    <button id="spin-btn">SPIN NOW!</button>
+    <button id="spin-btn">SPIN FOR SALAMI!</button>
     <div id="result"></div>
 
     <div id="form-overlay">
         <div id="claim-form">
             <h3>Claim Your Salami</h3>
-            <p id="won-amount-text" style="color: #f1c40f; font-size: 20px;">6.9 TK!</p>
+            <p id="won-display" style="color: #f1c40f; font-size: 24px; font-weight: bold;"></p>
             <input type="text" id="userName" placeholder="Your Name" required>
-            <input type="text" id="userPhone" placeholder="bKash Number (11 digits)" required>
+            <input type="text" id="userPhone" placeholder="bKash Number (01XXXXXXXXX)" required>
             <button id="submit-btn">Submit Details</button>
         </div>
     </div>
 
     <script>
-        // --- PASTE YOUR GOOGLE SCRIPT URL HERE ---
         const scriptURL = 'https://script.google.com/macros/s/AKfycbw8b5cvCcUwKN-xEPaaW3V2bDY4ilaz-jTG952utvZiBZqa4Ct2BMe_MVBWSE3A7wqeeQ/exec'; 
 
         const canvas = document.getElementById('wheel');
@@ -83,107 +49,81 @@
         const btn = document.getElementById('spin-btn');
         const resDiv = document.getElementById('result');
         const overlay = document.getElementById('form-overlay');
+        const wonDisplay = document.getElementById('won-display');
 
-        const prizes = [2, 5, 6.9, 9, 19, 29, 39, 49, 59, 69, 79, 89, 99];
-        const colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71', '#1abc9c', '#34495e', '#7f8c8d', '#d35400', '#c0392b', '#8e44ad', '#2980b9'];
+        // New Prize List
+        const prizes = [6.9, 5.9, 7.9, 15.9, 4.9, 9.9, 69.69, 19.9, 12.25, 10.75];
+        const colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71', '#1abc9c', '#34495e', '#7f8c8d', '#d35400'];
         const prizeCount = prizes.length;
         const arc = (2 * Math.PI) / prizeCount;
         let totalRotation = 0;
+        let currentWonAmount = 0;
 
-        // Draw the wheel (same logic)
         function drawWheel() {
             prizes.forEach((prize, i) => {
                 const angle = i * arc;
-                ctx.beginPath(); ctx.fillStyle = colors[i % colors.length]; ctx.moveTo(200, 200); ctx.arc(200, 200, 200, angle, angle + arc); ctx.lineTo(200, 200); ctx.fill();
-                ctx.save(); ctx.translate(200, 200); ctx.rotate(angle + arc / 2); ctx.textAlign = "right"; ctx.fillStyle = "white"; ctx.font = "bold 16px Arial";
-                ctx.fillText(prize + " TK", 180, 10); ctx.restore();
+                ctx.beginPath(); ctx.fillStyle = colors[i % colors.length]; ctx.moveTo(225, 225); ctx.arc(225, 225, 225, angle, angle + arc); ctx.lineTo(225, 225); ctx.fill();
+                ctx.save(); ctx.translate(225, 225); ctx.rotate(angle + arc / 2); ctx.textAlign = "right"; ctx.fillStyle = "white"; ctx.font = "bold 15px Arial";
+                ctx.fillText(prize + " TK", 210, 8); ctx.restore();
             });
         }
 
-        // Spin Logic
         btn.onclick = () => {
-            if(localStorage.getItem('salami_claimed') === 'true') {
-                alert("You have already claimed your Salami! Thanks!");
-                return;
+            btn.disabled = true;
+            resDiv.innerText = "Good luck...";
+
+            // Track spin count in local storage
+            let spinCount = parseInt(localStorage.getItem('total_spins') || '0') + 1;
+            localStorage.setItem('total_spins', spinCount);
+
+            let targetIndex;
+            // Requirement: 69.69 (Index 6) on the 20th spin
+            if (spinCount === 20) {
+                targetIndex = 6; 
+            } else {
+                // Otherwise, pick a random index EXCEPT 6 (to keep 69.69 rare/locked)
+                // If you want 69.69 to be possible before 20, just use: Math.floor(Math.random() * prizeCount)
+                do {
+                    targetIndex = Math.floor(Math.random() * prizeCount);
+                } while (targetIndex === 6); 
             }
 
-            btn.disabled = true;
-            overlay.style.display = "none"; // Ensure form is hidden
-            resDiv.innerText = "Spinning for Salami...";
-            
-            const targetIndex = 2; // Always 6.9 TK
+            currentWonAmount = prizes[targetIndex];
             const spins = 6 * 360; 
             const degreesPerSegment = 360 / prizeCount;
             const targetCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
             const finalAngle = spins + (270 - targetCenterAngle);
+            
             totalRotation += (finalAngle - (totalRotation % 360)) + 360;
-
             canvas.style.transform = `rotate(${totalRotation}deg)`;
 
             setTimeout(() => {
-                resDiv.innerText = "🎉 Congratulations!";
-                overlay.style.display = "flex"; // SHOW THE POP-UP
+                resDiv.innerText = `🎉 You won ${currentWonAmount} TK!`;
+                wonDisplay.innerText = `${currentWonAmount} TK`;
+                overlay.style.display = "flex";
             }, 4000);
         };
 
-        // Form Submission Logic with Validation
         document.getElementById('submit-btn').onclick = function() {
             const name = document.getElementById('userName').value.trim();
             const phone = document.getElementById('userPhone').value.trim();
-            const submitBtn = this;
+            const bkashRegex = /^01[3-9]\d{8}$/;
 
-            // --- 1. Basic Validation ---
-            if (name.length < 2) {
-                alert("Please enter your full name.");
+            if (name.length < 2 || !bkashRegex.test(phone)) {
+                alert("Please enter a valid Name and 11-digit bKash number.");
                 return;
             }
 
-            // --- 2. bKash Validation (11 digits, starts with 01) ---
-            const bkashRegex = /^01[3-9]\d{8}$/; 
-            if (!bkashRegex.test(phone)) {
-                alert("Enter a valid 11-digit bKash number (e.g., 017XXXXXXXX).");
-                return;
-            }
+            this.innerText = "Sending...";
+            this.disabled = true;
 
-            submitBtn.innerText = "Sending Request...";
-            submitBtn.disabled = true;
-
-            // --- 3. Send to Google Sheet ---
             fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors', 
-                cache: 'no-cache',
+                method: 'POST', mode: 'no-cors', cache: 'no-cache',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name: name, 
-                    phone: phone, 
-                    amount: "6.9 TK",
-                    platform: "Spinner App" 
-                })
-            })
-            .then(() => {
-                // Success State
-                resDiv.innerHTML = "✅ Salami Request Sent!";
-                document.getElementById('claim-form').innerHTML = `
-                    <div style="text-align:center;">
-                        <h2 style="color: #27ae60;">Request Received!</h2>
-                        <p>Thanks, ${name}!</p>
-                        <p>6.9 TK will be sent to <strong>${phone}</strong> soon.</p>
-                        <p style="font-size: 12px; color: #bdc3c7;">(Allow up to 24 hours for bKash)</p>
-                    </div>`;
-                
-                // Set local storage so they can't spin again
-                localStorage.setItem('salami_claimed', 'true');
-                
-                // Close overlay automatically after 5 seconds
-                setTimeout(() => {
-                    overlay.style.display = "none";
-                }, 5000);
-            })
-            .catch(err => {
-                alert("Connection Error. Please try again.");
-                submitBtn.disabled = false;
-                submitBtn.innerText = "Submit Details";
+                body: JSON.stringify({ name: name, phone: phone, amount: currentWonAmount + " TK" })
+            }).then(() => {
+                document.getElementById('claim-form').innerHTML = `<h3>Success!</h3><p>Sent to Sheet.</p>`;
+                setTimeout(() => { overlay.style.display = "none"; }, 3000);
             });
         };
 
