@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Salami from Raihan🌙</title>
+    <title>Salami Closed 🌙</title>
     <style>
-        /* General Styles */
         body { 
             text-align: center; 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -13,204 +12,82 @@
             color: white; 
             margin: 0; 
             padding-top: 50px; 
-            overflow-x: hidden;
         }
 
-        h1 { margin-bottom: 30px; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
-
-        /* Spinner Container */
         .spinner-container { 
             position: relative; 
             display: inline-block; 
             margin-bottom: 20px;
         }
-        
-        /* The Red Arrow Indicator */
-        .arrow { 
-            position: absolute; 
-            top: -25px; 
-            left: 50%; 
-            transform: translateX(-50%); 
-            width: 0; 
-            height: 0; 
-            border-left: 20px solid transparent; 
-            border-right: 20px solid transparent; 
-            border-top: 45px solid #e74c3c; 
-            z-index: 10; 
-            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
-        }
 
-        /* The Canvas Wheel */
+        /* Grayed out wheel */
         canvas { 
-            border: 12px solid #ecf0f1; 
+            border: 12px solid #7f8c8d; 
             border-radius: 50%; 
-            background: white; 
-            box-shadow: 0 15px 35px rgba(0,0,0,0.6); 
-            transition: transform 5s cubic-bezier(0.15, 0, 0.15, 1); 
+            background: #ecf0f1; 
+            filter: grayscale(100%) opacity(0.4); /* Makes it look "Off" */
             max-width: 90vw;
             max-height: 90vw;
         }
 
-        /* Buttons */
+        /* Message Box */
+        .closed-box {
+            background: #c0392b;
+            padding: 30px;
+            border-radius: 15px;
+            width: 80%;
+            max-width: 400px;
+            margin: 20px auto;
+            border: 3px solid #fff;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            animation: shake 0.5s ease-in-out infinite alternate;
+        }
+
+        @keyframes shake {
+            from { transform: rotate(-1deg); }
+            to { transform: rotate(1deg); }
+        }
+
+        h2 { font-size: 28px; margin: 0; }
+        p { font-size: 18px; margin-top: 10px; opacity: 0.9; }
+
         #spin-btn { 
-            margin-top: 30px; 
-            padding: 18px 60px; 
-            font-size: 24px; 
+            margin-top: 20px; 
+            padding: 15px 50px; 
+            font-size: 20px; 
             font-weight: bold; 
-            cursor: pointer; 
-            background: #27ae60; 
-            color: white; 
+            background: #7f8c8d; 
+            color: #bdc3c7; 
             border: none; 
             border-radius: 50px; 
-            box-shadow: 0 5px #1e8449;
-            transition: 0.2s;
-        }
-        #spin-btn:active { transform: translateY(3px); box-shadow: 0 2px #1e8449; }
-        #spin-btn:disabled { background: #7f8c8d; cursor: not-allowed; box-shadow: none; opacity: 0.7; }
-
-        #result { margin-top: 25px; font-size: 28px; color: #f1c40f; font-weight: bold; min-height: 40px; }
-
-        /* Pop-up Overlay (Modal) */
-        #form-overlay { 
-            display: none; 
-            position: fixed; 
-            top: 0; left: 0; 
-            width: 100%; height: 100%; 
-            background: rgba(0,0,0,0.9); 
-            z-index: 100; 
-            justify-content: center; 
-            align-items: center; 
-        }
-
-        #claim-form { 
-            background: #34495e; 
-            padding: 35px; 
-            border-radius: 20px; 
-            width: 340px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5); 
-            animation: popIn 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-        }
-
-        @keyframes popIn {
-            from { transform: scale(0.6); opacity: 0; }
-            to { transform: scale(1); opacity: 1; }
-        }
-
-        input { 
-            width: 90%; 
-            padding: 14px; 
-            margin: 12px 0; 
-            border-radius: 8px; 
-            border: 2px solid #2c3e50; 
-            font-size: 16px; 
-            outline: none;
-        }
-        input:focus { border-color: #f1c40f; }
-
-        #submit-btn { 
-            background: #f1c40f; 
-            color: #2c3e50; 
-            font-weight: bold; 
-            padding: 14px; 
-            border: none; 
-            cursor: pointer; 
-            width: 100%; 
-            border-radius: 8px; 
-            font-size: 20px; 
-            margin-top: 15px;
-            transition: background 0.3s;
-        }
-        #submit-btn:hover { background: #d4ac0d; }
-
-        .share-btn {
-            display: inline-block;
-            margin-top: 20px;
-            padding: 12px 25px;
-            background: #25D366;
-            color: white;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: bold;
+            cursor: not-allowed;
         }
     </style>
 </head>
 <body>
 
-    <h1>Get Your Salami from Raihan🌙</h1>
+    <h1>🌙 Eid Salami Spinner</h1>
     
     <div class="spinner-container">
-        <div class="arrow"></div>
         <canvas id="wheel" width="450" height="450"></canvas>
     </div>
 
-    <br>
-    <button id="spin-btn">SPIN FOR SALAMI!</button>
-    <div id="result"></div>
-
-    <div id="form-overlay">
-        <div id="claim-form">
-            <div id="form-content">
-                <h3 style="margin-top:0;">Claim Your Salami</h3>
-                <p style="font-size: 18px;">You won: <span id="won-display" style="color:#f1c40f; font-weight:bold;"></span></p>
-                <input type="text" id="userName" placeholder="Your Name" required>
-                <input type="text" id="userPhone" placeholder="bKash Number (11 digits)" required>
-                <button id="submit-btn">Submit & Save</button>
-            </div>
-        </div>
+    <div class="closed-box">
+        <h2>গরীব হয়ে গেছি, আজ আর নয়! 💸</h2>
+        <p>সব সালামি শেষ। আবার দেখা হবে ইনশাআল্লাহ্।</p>
     </div>
 
+    <button id="spin-btn" disabled>CLOSED</button>
+
     <script>
-        // --- 0. THE KILL SWITCH ---
-const isOutOfSalami = true; // Set to 'false' if you ever want to reopen!
-
-if (isOutOfSalami) {
-    window.onload = () => {
-        // Disable the utton
-        btn.disabled = true;
-        btn.style.background = "#7f8c8d";
-        btn.innerText = "CLOSED";
-        
-        // Show your funny message
-        resDiv.innerHTML = `
-            <div style="background: #e74c3c; padding: 20px; border-radius: 10px; margin-top: 20px; border: 2px solid #fff;">
-                <h2 style="margin:0;">গরীব হয়ে গেছি, আজ আর নয়! 💸</h2>
-                <p style="font-size: 16px; margin-top:10px;">সব সালামি শেষ। আবার দেখা হবে ইনশাআল্লাহ্।</p>
-            </div>
-        `;
-        
-        // Hide the arrow so it looks "off duty"
-        document.querySelector('.arrow').style.display = 'none';
-        // Make the wheel look grayscale/faded
-        canvas.style.filter = 'grayscale(100%) opacity(0.5)';
-    };
-}
-        // --- 1. CONFIGURATION ---
-        // Replace this with your Google Apps Script Web App URL
-        const scriptURL = 'https://script.google.com/macros/s/AKfycbw8b5cvCcUwKN-xEPaaW3V2bDY4ilaz-jTG952utvZiBZqa4Ct2BMe_MVBWSE3A7wqeeQ/exec'; 
-
         const canvas = document.getElementById('wheel');
         const ctx = canvas.getContext('2d');
-        const btn = document.getElementById('spin-btn');
-        const resDiv = document.getElementById('result');
-        const overlay = document.getElementById('form-overlay');
-        const wonDisplay = document.getElementById('won-display');
 
-        const prizes = [6.9, 5.9, 7.9, 8.9, 4.9, 9.9, 12.69, 3.9, 2.25, 10.75];
-        const colors = ['#f1c40f', '#e67e22', '#e74c3c', '#9b59b6', '#3498db', '#2ecc71', '#1abc9c', '#34495e', '#7f8c8d', '#d35400'];
+        // The same prize list for the visual effect
+        const prizes = [6.9, 5.9, 7.9, 15.9, 4.9, 9.9, 69.69, 19.9, 12.25, 10.75];
+        const colors = ['#bdc3c7', '#95a5a6', '#7f8c8d', '#ced4da']; // Dull colors
         const prizeCount = prizes.length;
         const arc = (2 * Math.PI) / prizeCount;
-        let totalRotation = 0;
-        let currentWonAmount = 0;
-
-        // --- 2. INITIALIZE ---
-        window.onload = () => {
-            if (localStorage.getItem('salami_claimed')) {
-                btn.disabled = true;
-                btn.innerText = "ALREADY SPUN";
-                resDiv.innerText = "You have already claimed your Salami! 🌙";
-            }
-            drawWheel();
-        };
 
         function drawWheel() {
             prizes.forEach((prize, i) => {
@@ -222,111 +99,18 @@ if (isOutOfSalami) {
                 ctx.lineTo(225, 225);
                 ctx.fill();
 
-                // Add Prize Text
                 ctx.save();
                 ctx.translate(225, 225);
                 ctx.rotate(angle + arc / 2);
                 ctx.textAlign = "right";
-                ctx.fillStyle = "white";
-                ctx.font = "bold 16px Arial";
+                ctx.fillStyle = "#2c3e50";
+                ctx.font = "bold 15px Arial";
                 ctx.fillText(prize + " TK", 210, 8);
                 ctx.restore();
             });
         }
 
-        // --- 3. SPIN LOGIC ---
-        btn.onclick = () => {
-            if (localStorage.getItem('salami_claimed')) return;
-
-            btn.disabled = true;
-            resDiv.innerText = "Spinning for luck...";
-
-            // Track global device spins for the 20th spin special (69.69 TK at Index 6)
-            let spinCount = parseInt(localStorage.getItem('total_spins_counter') || '0') + 1;
-            localStorage.setItem('total_spins_counter', spinCount);
-
-            let targetIndex;
-            if (spinCount === 20) {
-                targetIndex = 6; // Force land on 69.69
-            } else {
-                // Otherwise random, but exclude 69.69 to keep it for the 20th spin
-                do { targetIndex = Math.floor(Math.random() * prizeCount); } 
-                while (targetIndex === 6);
-            }
-
-            currentWonAmount = prizes[targetIndex];
-            const spins = 10 * 360; // Extra spins for drama
-            const degreesPerSegment = 360 / prizeCount;
-            const targetCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
-            
-            // Align chosen segment to the 12 o'clock (270deg) position
-            const finalAngle = spins + (270 - targetCenterAngle);
-            totalRotation += (finalAngle - (totalRotation % 360)) + 360;
-
-            canvas.style.transform = `rotate(${totalRotation}deg)`;
-
-            setTimeout(() => {
-                resDiv.innerText = `🎉 You won ${currentWonAmount} TK!`;
-                wonDisplay.innerText = `${currentWonAmount} TK`;
-                overlay.style.display = "flex";
-            }, 5200);
-        };
-
-        // --- 4. FORM SUBMISSION ---
-        document.getElementById('submit-btn').onclick = function() {
-            const name = document.getElementById('userName').value.trim();
-            const phone = document.getElementById('userPhone').value.trim();
-            const bkashRegex = /^01[3-9]\d{8}$/;
-
-            if (name.length < 2) {
-                alert("Please enter your name.");
-                return;
-            }
-            if (!bkashRegex.test(phone)) {
-                alert("Please enter a valid 11-digit bKash number (starts with 01).");
-                return;
-            }
-
-            this.innerText = "Sending...";
-            this.disabled = true;
-
-            fetch(scriptURL, {
-                method: 'POST',
-                mode: 'no-cors',
-                cache: 'no-cache',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ 
-                    name: name, 
-                    phone: phone, 
-                    amount: currentWonAmount + " TK" 
-                })
-            }).then(() => {
-                // Mark as claimed
-                localStorage.setItem('salami_claimed', 'true');
-
-                // Generate WhatsApp Share Link
-                const shareText = `I just won ${currentWonAmount} TK Salami from this spinner! Try your luck here: ${window.location.href}`;
-                const waLink = `https://api.whatsapp.com/send?text=${encodeURIComponent(shareText)}`;
-
-                document.getElementById('claim-form').innerHTML = `
-                    <div style="text-align:center;">
-                        <h2 style="color: #27ae60; margin-bottom:10px;">🎉 Congratulations, ${name}!</h2>
-                        <p style="font-size:18px; line-height:1.4;">
-                            Your salami of <strong>${currentWonAmount} TK</strong> will be sent to <strong>${phone}</strong> soon.
-                        </p>
-                        <p style="font-style:italic; margin-top:20px; color:#bdc3c7;">
-                            "Don't forget to share after receiving salami!"
-                        </p>
-                        <a href="${waLink}" target="_blank" class="share-btn">Share on WhatsApp</a>
-                        <br><br>
-                        <button onclick="location.reload()" style="background:none; border:none; color:#bdc3c7; cursor:pointer; text-decoration:underline; font-size:14px;">Close</button>
-                    </div>`;
-            }).catch(err => {
-                alert("Error sending request. Please check internet.");
-                this.disabled = false;
-                this.innerText = "Submit & Save";
-            });
-        };
+        drawWheel();
     </script>
 </body>
 </html>
